@@ -2,6 +2,7 @@ import tweepy
 from dotenv import load_dotenv
 import os
 import logging
+import openai
 
 # Set up logging
 LOG_FORMAT = '%(levelname)s %(asctime)s - %(message)s'
@@ -17,6 +18,7 @@ consumer_key = os.getenv('API_KEY')
 consumer_secret = os.getenv('API_SECRET')
 access_token = os.getenv('ACCESS_TOKEN')
 access_token_secret = os.getenv('ACCESS_TOKEN_SECRET')
+open_ai = os.getenv('OPEN_AI')
 
 # Authentication
 client = tweepy.Client(
@@ -25,7 +27,6 @@ client = tweepy.Client(
     access_token=access_token,
     access_token_secret=access_token_secret
 )
-
 
 
 def create_tweet(tweet):
