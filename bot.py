@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 import os
 import logging
 from openai import OpenAI
-
 import random
 import time
 
@@ -24,27 +23,26 @@ access_token_secret = os.getenv('ACCESS_TOKEN_SECRET')
 open_ai = os.getenv('OPEN_AI')
 
 # Authentication
-client = tweepy.Client(
+twitter_client = tweepy.Client(
+    bearer_token=bearer_token,
     consumer_key=consumer_key,
     consumer_secret=consumer_secret,
     access_token=access_token,
     access_token_secret=access_token_secret
 )
 
-client = OpenAI(api_key=open_ai)
+openai_client = OpenAI(api_key=open_ai)
 
 
 def generate_tweet(topic):
     prompt = f"Generate a relevant and interesting tweet about {topic}"
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+    response = openai_client.chat.completions.create(
+        model="gpt-4-turbo-preview",
         messages=[
-            {"role": "system", "content": "You are an expert software \
-                    developer, and you are trying to \
-                    create a social presence on twitter"},
+            {"role": "system", "content": "You are an expert software developer, and you are trying to create a social presence on Twitter"},
             {"role": "user", "content": prompt}
         ],
-        )
+    )
 
     tweet = response.choices[0].message.content.strip()
 
@@ -53,23 +51,22 @@ def generate_tweet(topic):
 
 def create_tweet(tweet):
     try:
-        response = client.create_tweet(text=tweet)
-        tweet_url = f"https://twitter.com/user/status/{response.data.id}"
+        response = twitter_client.create_tweet(text=tweet)
+        tweet_url = f"https://twitter.com/user/status/{response.data['id']}"
         return tweet_url
     except Exception as e:
         log.error(f"Error creating tweet: {e}")
         raise SystemExit(f"Error creating tweet: {e}")
 
-    return tweet_url
 
-
-topics = ["MongoDb", "artificial intelligence", "Jenkins", "health", "python", "Javasccript", "Kubernetes"]
+topics = ["MongoDB", "artificial intelligence", "Jenkins", "health", "python", "JavaScript", "Kubernetes"]
 
 
 def main():
     topic = random.choice(topics)
     tweet = generate_tweet(topic)
-    log.info("Tweet posted successfully")
+    tweet_url = create_tweet(tweet)
+    log.info(f"Tweet posted successfully: {tweet_url}")
 
 
 if __name__ == "__main__":
